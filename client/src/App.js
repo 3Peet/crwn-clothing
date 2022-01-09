@@ -1,7 +1,6 @@
 import React, {useEffect} from "react";
 import {Switch, Route, Redirect} from "react-router-dom";
-import {connect} from "react-redux";
-import {createStructuredSelector} from "reselect";
+import {useSelector, useDispatch} from "react-redux";
 
 import "./App.css";
 
@@ -14,10 +13,13 @@ import CheckoutPage from "./components/pages/checkout/checkout.component";
 import {selectCurrentUser} from "./redux/user/user.selectors";
 import {checkUserSession} from "./redux/user/user.actions";
 
-const App = ({checkUserSession, currentUser}) => {
+const App = () => {
+	const currentUser = useSelector(selectCurrentUser);
+	const dispatch = useDispatch();
+
 	useEffect(() => {
-		checkUserSession();
-	}, [checkUserSession]);
+		dispatch(checkUserSession());
+	}, [dispatch]);
 
 	return (
 		<div>
@@ -31,11 +33,7 @@ const App = ({checkUserSession, currentUser}) => {
 					exact
 					path="/signin"
 					render={() =>
-						this.props.currentUser ? (
-							<Redirect to="/" />
-						) : (
-							<SignInAndSignUpPage />
-						)
+						currentUser ? <Redirect to="/" /> : <SignInAndSignUpPage />
 					}
 				/>
 			</Switch>
@@ -43,12 +41,4 @@ const App = ({checkUserSession, currentUser}) => {
 	);
 };
 
-const mapStateToProps = createStructuredSelector({
-	currentUser: selectCurrentUser,
-});
-
-const mapDispatchToProps = (dispatch) => ({
-	checkUserSession: () => dispatch(checkUserSession()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;
